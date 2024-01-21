@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, flash, redirect, session, jsonify
+from flask import Flask, render_template, request, flash, redirect, session
+from flask import jsonify
 
 # from flask_sqlalchemy import SQLAlchemy
 import bcrypt
@@ -43,7 +44,7 @@ db = MySQL(app)
 
 
 # Showing user interest based movies
-def recommend_movie(user_id):
+def recommend_movie(user_id, num_movies=6):
     with open("datafiles/collabrative_similarity_score.pkl", "rb") as file:
         similarity_score = pickle.load(file)
 
@@ -54,7 +55,7 @@ def recommend_movie(user_id):
         list(enumerate(similarity_score[user_id])),
         key=lambda x: x[1],
         reverse=True,
-    )[:6]
+    )[:num_movies]
     movie_ids = [str(i[0]) for i in recomm_movies]
 
     recommended_movies = []
@@ -73,15 +74,14 @@ def recommend_movie(user_id):
 
 
 def collabrativeMovieImage():
-    
     url = "https://api.themoviedb.org/3/movie/145/images"
 
     headers = {
         "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMGQ3ZTMwMjA0YzRjYzJiMWIxNjA3YjcwMzkxMzVkOSIsInN1YiI6IjYzZDQxN2JjZDlmNGE2MDA4ZmEwOGJmZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.xk9JB-8B-k5JdoKj05V9C4x8BceYQZmg8VPshTTF2-U"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMGQ3ZTMwMjA0YzRjYzJiMWIxNjA3YjcwMzkxMzVkOSIsInN1YiI6IjYzZDQxN2JjZDlmNGE2MDA4ZmEwOGJmZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.xk9JB-8B-k5JdoKj05V9C4x8BceYQZmg8VPshTTF2-U",
     }
 
-    response = requests.get(url, headers=headers)
+    response = rq.get(url, headers=headers)
 
     print(response.text)
 
@@ -95,12 +95,26 @@ def index():
         with open("datafiles/display_movies.pkl", "rb") as file:
             dispaly_movies = pickle.load(file)
         user_id = session["user"]["id"]
-        user_based_movies = recommend_movie(user_id)
-        # print(user_based_movies)
+        user_based_movies = recommend_movie(user_id, num_movies=6)
+
+        # Friend based movie recommender
+        cursor = db.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            'select * from friends where user_id=(%s)', (str(user_id),)
+        )
+        user_friend = cursor.fetchall()
+        user_friend_movies = []
+        user_friends_id = [y['friend_id'] for y in user_friend]
+        print(user_friends_id)
+        if len(user_friends_id) > 6:
+            for i in range(5):
+                user_friend_movies.append(recommend_movie(user_friends_id[i], num_movies=2))
+
         return render_template(
             "index.html",
             display_movies=dispaly_movies,
             user_based_movies=user_based_movies,
+            user_friend_movies=user_friend_movies
         )
 
 
@@ -156,6 +170,13 @@ def login():
             return redirect("/login")
 
     return render_template("login.html")
+
+
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.pop('user', None)
+    flash("Logout successfully")
+    return redirect("/login")
 
 
 @app.route("/dashboard")
@@ -278,6 +299,71 @@ def addReview():
         return jsonify(response)
     else:
         return "Invalid input"
+
+
+@app.route("/connections")
+def openConnectionPage():
+    if "user" in session:
+        user_id = session["user"]["id"]
+        cursor = db.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "select * from friends where user_id=(%s)",
+            (str(user_id),),
+        )
+        user_friends = cursor.fetchall()
+        friends_count = []
+        if len(user_friends) > 0:
+            last_dict = user_friends[-1]
+            friends_count.append(last_dict["followers"])
+            friends_count.append(last_dict["followings"])
+            cursor.execute(
+                "SELECT * FROM users LEFT JOIN friends ON users.id = friends.friend_id where friends.user_id != (%s) or friends.user_id is null;",
+                (str(user_id)),
+            )
+            users = cursor.fetchall()
+            # print(last_dict)
+        else:
+            friends_count.append(0)
+            friends_count.append(0)
+            cursor.execute(
+                "SELECT * FROM users",
+            )
+            users = cursor.fetchall()
+        # friends_coun = [str(x).replace("None", "0") for x in users['followers']]
+        # print(friends_coun)
+        return render_template("connections.html", friends_count=friends_count, users=users)
+    else:
+        flash("Please login to enjoy yaFlix")
+        return redirect("/login")
+
+
+# add friend to connection
+@app.route("/addfriend", methods=["POST"])
+def addFriend():
+    datas = request.get_data()
+    data = parse_qs(datas.decode("utf-8"))
+    cursor = db.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    friendid = data["friendid"]
+    userid = session["user"]["id"]
+    followers = 0
+    followings = 0
+
+    # find the currently logged in user to ge his account details
+    cursor.execute("select * from friends where user_id=(%s)", (str(userid)))
+    userdetails = cursor.fetchall()
+    if len(userdetails) > 0:
+        userdetails = userdetails[-1]
+        followers = userdetails["followers"]
+        followings = userdetails["followings"]
+
+    cursor.execute(
+        "insert into friends(user_id, friend_id, request, followers, followings) values (%s, %s, %s, %s, %s)",
+        (userid, friendid, "send", followers, followings),
+    )
+    cursor.connection.commit()
+
+    return jsonify({"status": "success", "message": "Friend added succesfully"})
 
 
 app.run(debug=True, port=5000)

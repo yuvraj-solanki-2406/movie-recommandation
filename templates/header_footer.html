@@ -25,6 +25,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/trending">Trending Movies</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/connections">Connect</a>
+                        </li>
                         <!-- <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Dropdown
@@ -62,7 +65,35 @@
         
         <script src="../static/JS/bootstrap.bundle.min.js" async defer></script>
         <script src="../static/JS/jquery.min.js" async defer></script>
-        <script src="../static/swiper/swiper-bundle.min.js" async defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            var swiper = new Swiper(".mySwiper", {
+                slidesPerView: 3,
+                spaceBetween: 30,
+                pagination: {
+                  el: ".swiper-pagination",
+                  clickable: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                breakpoints: {
+                    100: {
+                      slidesPerView: 1,
+                      spaceBetween: 20,
+                    },
+                    576: {
+                      slidesPerView: 2,
+                      spaceBetween: 10,
+                    },
+                    991: {
+                      slidesPerView: 3,
+                      spaceBetween: 50,
+                    },
+                },
+            });
+        </script>
         {% block script %}{% endblock script %}
     </body>
 </html>

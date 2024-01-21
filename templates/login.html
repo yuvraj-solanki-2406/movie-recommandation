@@ -13,6 +13,7 @@
 
     <div class="container my-4 login_container">
         <h2 class="text-center">Login Form</h2>
+        {{session['user']}}
         <form action="login", method="POST">
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>

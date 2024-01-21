@@ -127,6 +127,10 @@ body {
     /* width: 24rem; */
 }
 
+.popular_movies_slider{
+    height: 550px;
+}
+
 .popular_card_section{
     margin-left: 1.5rem;
     margin-right: 1.5rem;
@@ -153,4 +157,101 @@ body {
     font-size: 18px;
     letter-spacing: 1px;
     /* text-decoration: underline; */
+}
+
+/* Connection Page */
+.connection_page{
+    margin: 50px;
+    width: 80%;
+}
+.conn_user_content{
+    border: 1.3px solid white;
+    border-radius: 10px;
+    box-shadow: 0 0px 1px 3px rgb(156, 156, 156);
+    padding: 25px 10px;
+    background-color: white;
+    color: black;
+    width: 100% !important;
+    margin: auto;
+    vertical-align: middle;
+}
+
+.conn_user_profile{
+    border: 1.3px solid white;
+    border-radius: 10px;
+    box-shadow: 0 0px 2px 5px rgb(156, 156, 156);
+    padding: 25px 10px;
+    background-color: white;
+    color: black;
+    width: 100% !important;
+}
+
+.user_img_name{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.user_image{
+    width: 120px;
+    height: 100px;
+    display: block;
+}
+
+.user_name{
+    display: block !important;
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.user_name:hover{
+    color: black;
+    text-decoration: underline;
+}
+
+.ruler{
+    color: black;
+}
+
+.user_friends_table{
+    color: black;
+}
+
+.user_friends_table tr td{
+    padding: 5px 0px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.user_cards{
+    align-items: left;
+}
+
+.user_friend_card{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border: 1.5px solid black;
+    border-radius: 7px;
+}
+
+.follower_following p{
+    font-size: 14px;
+}
+
+.follower_following span{
+    color: green;
+}
+
+.swiper-button-next:after, .swiper-button-prev:after{
+    color: #ff0000 !important;
+    font-size: 29px !important;
+    background-color: #198754 !important;
+    opacity: 0.5;
 }

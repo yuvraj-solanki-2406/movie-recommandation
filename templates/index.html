@@ -5,32 +5,40 @@ Page{%endblock title %} {% block content %}
   <h1>Popular Movies</h1>
   <div>
     <div class="popular_movies_slider">
-      <section class="popular_card_section row">
-        {% for key, values in display_movies['movie_id'].items() %} 
-          {% if key<12 %}
-            <div class="card popular_card col-lg-3 col-md-4 col-12 col-sm-6 p-0">
-            <div class="card-header">
-                <h5>{{ display_movies['title'][key] }}</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Directed By: <span class="dir_name fw-bold">{{display_movies['crew'][key][0]}}</span></p>
-                <h5 class="card-title">Star Cast</h5>
-                <ol>
-                    {% for cast in display_movies['cast'][key] %}
-                        <li>{{cast}}</li>
-                    {% endfor %}
-                </ol>
-                <h5 class="card-title">Genres</h5>
-                <p>{% for genres in display_movies['genres'][key] %}<span>{{genres}}, </span>{% endfor %}</p>
-                <a href="moviedetail/{{values}}" class="btn btn-success">Watch Trailer<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                  </svg>
-                </a>
-            </div>
-            <div class="card-footer text-muted">Average Voting: <span class="fw-bold">{{display_movies['vote_average'][key]}}</span></div>
-            </div>
-          {% endif %} 
-        {% endfor %} 
+      <section class="popular_card_section">
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            {% for key, values in display_movies['movie_id'].items() %} 
+              {% if key<12 %}
+                <div class="swiper-slide">
+                  <div class="card popular_card p-0">
+                    <div class="card-header">
+                        <h5>{{ display_movies['title'][key] }}</h5>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">Directed By: <span class="dir_name fw-bold">{{display_movies['crew'][key][0]}}</span></p>
+                      <h5 class="card-title">Star Cast</h5>
+                      <ol>
+                          {% for cast in display_movies['cast'][key] %}
+                              <li>{{cast}}</li>
+                          {% endfor %}
+                      </ol>
+                      <h5 class="card-title">Genres</h5>
+                      <p>{% for genres in display_movies['genres'][key] %}<span>{{genres}}, </span>{% endfor %}</p>
+                      <a href="moviedetail/{{values}}" class="btn btn-success">Watch Trailer<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                          <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                        </svg>
+                      </a>
+                    </div>
+                    <div class="card-footer text-muted">Average Voting: <span class="fw-bold">{{display_movies['vote_average'][key]}}</span></div>
+                  </div>
+                </div>
+              {% endif %} 
+            {% endfor %} 
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
       </section>
     </div>
   </div>
@@ -60,6 +68,35 @@ Page{%endblock title %} {% block content %}
     </div>
   </div>
 </div>
+
+{% if user_friend_movies %}
+  <div class="user_based_movies">
+    <h1>Based on your Friends Interest</h1>
+    <div>
+      <div class="user_based_movies_slider">
+        <section class="popular_card_section row">
+          {% for movie_list in user_friend_movies %} 
+            {% for movie_detials in movie_list %}
+              {% for movie_detial in movie_detials %}
+                <div class="card popular_card col-lg-3 col-md-4 col-12 col-sm-6 p-0">
+                  <img class="card-img-top" id="image_{{movie_detial[0]}}" src="" alt="Title">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ movie_detial[1] }}</h5>
+                    <a href="moviedetail/{{movie_detial[0]}}" class="btn btn-success">Watch Trailer<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                        <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                      </svg>
+                    </a>
+                  </div>
+                  <div class="card-footer text-muted">Average Voting: <span class="fw-bold">{{movie_detial[2]}}</span></div>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          {% endfor %} 
+        </section>
+      </div>
+    </div>
+  </div>
+{% endif %}
 
 <div class="top_movies mb-5">
   <h1>Top Movies</h1>
@@ -111,4 +148,5 @@ Page{%endblock title %} {% block content %}
   window.addEventListener("load", getMovieData());
 
 </script>
+
 {% endblock script %}
