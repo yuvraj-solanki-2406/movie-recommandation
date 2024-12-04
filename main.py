@@ -14,9 +14,9 @@ app = Flask(__name__)
 app.secret_key = "secret_key"
 
 app.config["MYSQL_HOST"] = "localhost"
-app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_USER"] = "username"
 app.config["MYSQL_PASSWORD"] = "password"
-app.config["MYSQL_DB"] = "yaflix"
+app.config["MYSQL_DB"] = "db_name"
 
 db = MySQL(app)
 
